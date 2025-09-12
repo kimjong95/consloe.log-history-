@@ -1,13 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, ReactNode } from "react";
 
-export default function IntroAnimation() {
+interface IntroAnimationProps {
+  theme?: "light" | "dark";
+  title?: string;
+  children?: ReactNode;
+}
+
+export default function IntroAnimation({ 
+  theme = "dark", 
+  title = "history",
+  children 
+}: IntroAnimationProps) {
   const [isAnimating, setIsAnimating] = useState(true);
-  const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [showContent, setShowContent] = useState(false);
   const [typedText, setTypedText] = useState("");
-  const fullText = "console.log(history)";
+  const fullText = `console.log(${title})`;
 
   useEffect(() => {
     let currentIndex = 0;
@@ -22,8 +31,6 @@ export default function IntroAnimation() {
 
     const animationTimer = setTimeout(() => {
       setIsAnimating(false);
-      setIsDarkTheme(true);
-      document.documentElement.classList.add("dark");
 
       setTimeout(() => {
         setShowContent(true);
@@ -34,14 +41,17 @@ export default function IntroAnimation() {
       clearInterval(typingInterval);
       clearTimeout(animationTimer);
     };
-  }, []);
+  }, [fullText]);
+
+  const bgColor = theme === "dark" ? "bg-black" : "bg-white";
+  const textColor = theme === "dark" ? "text-white" : "text-black";
 
   return (
     <>
       <div
-        className={`fixed inset-0 transition-all duration-1000 ease-in-out ${
-          isDarkTheme ? "bg-black" : "bg-white"
-        } ${showContent ? "opacity-0 pointer-events-none delay-500" : ""}`}
+        className={`fixed inset-0 transition-all duration-1000 ease-in-out ${bgColor} ${
+          showContent ? "opacity-0 pointer-events-none delay-500" : ""
+        }`}
       />
 
       <div
@@ -49,13 +59,13 @@ export default function IntroAnimation() {
           isAnimating
             ? "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl md:text-7xl"
             : "top-8 left-8 text-xl md:text-2xl"
-        } ${isDarkTheme ? "text-white" : "text-black"}`}
+        } ${textColor}`}
       >
-        {typedText.includes("history") ? (
+        {typedText.includes(title) ? (
           <>
-            {typedText.substring(0, typedText.indexOf("history"))}
-            <span className="text-green-500">history</span>
-            {typedText.substring(typedText.indexOf("history") + 7)}
+            {typedText.substring(0, typedText.indexOf(title))}
+            <span className="text-green-500">{title}</span>
+            {typedText.substring(typedText.indexOf(title) + title.length)}
           </>
         ) : (
           typedText
@@ -67,16 +77,19 @@ export default function IntroAnimation() {
 
       {showContent && (
         <div className="animate-fadeIn">
-          <MainContent />
+          {children || <DefaultContent theme={theme} />}
         </div>
       )}
     </>
   );
 }
 
-function MainContent() {
+function DefaultContent({ theme }: { theme: "light" | "dark" }) {
+  const bgColor = theme === "dark" ? "bg-black" : "bg-white";
+  const textColor = theme === "dark" ? "text-white" : "text-black";
+  
   return (
-    <div className="min-h-screen bg-black text-white p-8 pt-24">
+    <div className={`min-h-screen ${bgColor} ${textColor} p-8 pt-24`}>
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-16">
           <div className="space-y-6"></div>
